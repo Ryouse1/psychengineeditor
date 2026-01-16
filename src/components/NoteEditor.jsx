@@ -1,75 +1,71 @@
 import { useState } from "react";
-import { Howl } from "howler";
 
-export default function NoteEditor({ songData, setSongData }) {
-  const [sectionNotes, setSectionNotes] = useState([]);
-  const [audio, setAudio] = useState(null);
+const LANES = 4;
+const WIDTH = 400;
+const HEIGHT = 600;
+const NOTE_SIZE = 20;
 
-  const addNote = () => {
-    setSectionNotes([...sectionNotes, [0, 0, 0]]);
-  };
+export default function NoteEditor() {
+  const [notes, setNotes] = useState([]);
 
-  const updateNote = (index, note) => {
-    const newNotes = [...sectionNotes];
-    newNotes[index] = note;
-    setSectionNotes(newNotes);
-  };
+  const handleClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
-  const saveSection = () => {
-    setSongData({
-      ...songData,
-      song: {
-        ...songData.song,
-        notes: [...songData.song.notes, { sectionNotes, sectionBeats: 4, mustHitSection: true }]
-      }
-    });
-    setSectionNotes([]);
-  };
+    const lane = Math.floor(x / (WIDTH / LANES));
+    const time = Math.floor((HEIGHT - y) * 10); // 仮：px → ms
 
-  const playAudio = () => {
-    if (!audio) {
-      const howl = new Howl({ src: ["/public/assets/sample.mp3"] });
-      setAudio(howl);
-      howl.play();
-    } else {
-      audio.play();
-    }
+    setNotes([...notes, { time, lane, length: 0 }]);
   };
 
   return (
-    <div className="p-2 border rounded mb-4">
-      <h2 className="font-bold mb-2">ノーツ編集</h2>
-      {sectionNotes.map((note, i) => (
-        <div key={i} className="flex gap-2 mb-1">
-          <input
-            type="number"
-            value={note[0]}
-            onChange={e => updateNote(i, [parseFloat(e.target.value), note[1], note[2]])}
-            className="border p-1 w-20"
+    <div>
+      <h3>Note Editor</h3>
+
+      <div
+        onClick={handleClick}
+        style={{
+          position: "relative",
+          width: WIDTH,
+          height: HEIGHT,
+          border: "1px solid #555",
+          background: "#111"
+        }}
+      >
+        {/* レーン */}
+        {[...Array(LANES)].map((_, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: (WIDTH / LANES) * i,
+              width: WIDTH / LANES,
+              height: "100%",
+              borderLeft: "1px solid #333"
+            }}
           />
-          <input
-            type="number"
-            value={note[1]}
-            onChange={e => updateNote(i, [note[0], parseInt(e.target.value), note[2]])}
-            className="border p-1 w-20"
+        ))}
+
+        {/* ノーツ */}
+        {notes.map((n, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              width: NOTE_SIZE,
+              height: NOTE_SIZE,
+              background: "#22c55e",
+              left: n.lane * (WIDTH / LANES) + (WIDTH / LANES) / 2 - NOTE_SIZE / 2,
+              top: HEIGHT - n.time / 10 - NOTE_SIZE / 2
+            }}
           />
-          <input
-            type="number"
-            value={note[2]}
-            onChange={e => updateNote(i, [note[0], note[1], parseFloat(e.target.value)])}
-            className="border p-1 w-20"
-          />
-        </div>
-      ))}
-      <button onClick={addNote} className="px-2 py-1 bg-green-600 text-white rounded mr-2">
-        ノーツ追加
-      </button>
-      <button onClick={saveSection} className="px-2 py-1 bg-blue-600 text-white rounded mr-2">
-        セクション保存
-      </button>
-      <button onClick={playAudio} className="px-2 py-1 bg-purple-600 text-white rounded">
-        曲再生
-      </button>
+        ))}
+      </div>
+
+      <pre style={{ fontSize: 12 }}>
+        {JSON.stringify(notes, null, 2)}
+      </pre>
     </div>
   );
 }
