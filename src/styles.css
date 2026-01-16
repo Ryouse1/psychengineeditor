@@ -1,15 +1,24 @@
 body {
   margin: 0;
-  background: #0f0f0f;
+  background: #0b0b0b;
   color: white;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui;
 }
 
-button {
-  background: #7c3aed;
-  border: none;
+button, select, input {
+  background: #222;
   color: white;
-  padding: 8px 12px;
+  border: none;
+  padding: 6px;
   border-radius: 6px;
-  cursor: pointer;
+}
+
+.toolbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: #111;
 }
