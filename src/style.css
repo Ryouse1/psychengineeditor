@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  background: #0f0f0f;
+  color: white;
+  font-family: system-ui, sans-serif;
+}
+
+button {
+  background: #7c3aed;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
